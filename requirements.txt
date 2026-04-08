@@ -1,0 +1,6 @@
+fastapi
+unicorn
+pydantic
+request
+python-dotenv
+huggingface-hub 
