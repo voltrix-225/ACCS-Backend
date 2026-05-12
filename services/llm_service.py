@@ -6,7 +6,7 @@ from .prompts import SYSTEM_PROMPT
 
 load_dotenv()
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
