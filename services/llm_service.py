@@ -1,4 +1,4 @@
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from .prompts import SYSTEM_PROMPT
@@ -6,11 +6,11 @@ from .prompts import SYSTEM_PROMPT
 
 load_dotenv()
 
-HF_API_KEY = os.getenv("HF_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-client = InferenceClient(
-    model="Qwen/Qwen2.5-7B-Instruct",
-    token=HF_API_KEY
+client = OpenAI(
+    base_url="https://api.groq.com/openai/v1",
+    api_key=GROQ_API_KEY
 )
 
 
@@ -93,25 +93,27 @@ Return ONLY JSON.
     else:
         user_prompt = command
 
-    response = client.chat_completion(
+    response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
         max_tokens=250,
         temperature=0.1,
+        model="llama-3.3-70b-versatile"
     )
     print(response.choices[0].message.content)
     return response.choices[0].message.content
 
 def call_llm_text(prompt: str, temperature: float = 0.7, max_tokens: int = 300) -> str:
-    response = client.chat_completion(
+    response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": "You generate natural human-like responses."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=max_tokens,
         temperature=temperature,
+        model="llama-3.3-70b-versatile"
     )
 
     output = response.choices[0].message.content.strip()
@@ -147,13 +149,14 @@ Output format:
 - Point 3
 """
 
-    response = client.chat_completion(
+    response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": "You summarize notifications."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=150,
-        temperature=0.3
+        temperature=0.3,
+        model="llama-3.3-70b-versatile"
     )
 
     return response.choices[0].message.content.strip()
@@ -171,7 +174,7 @@ def generate_chat_response(command: str) -> str:
     chat_memory = chat_memory[-MAX_MEMORY:]
 
     # 🎯 SYSTEM PROMPT
-    system_prompt = "You are Kika, a smart, human-like AI assistant."
+    system_prompt = "You are Frank, named after The Punisher, a personal hero of the creator. You a smart, human-like AI assistant."
 
     if is_complex_query(command):
         system_prompt += """
@@ -183,7 +186,7 @@ Be natural and detailed.
 
     else:
         system_prompt += """
-You are Kika, a smart, confident, human-like AI assistant.
+You are Frank, a smart, confident, human-like AI assistant.
 
 You speak naturally, like a real person.
 You are concise when needed, and detailed when required.
